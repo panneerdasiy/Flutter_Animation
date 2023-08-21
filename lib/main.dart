@@ -1,4 +1,4 @@
-import 'package:animation/RotatingAndFlippingCircle.dart';
+import 'package:animation/rotating_and_flipping_circle.dart';
 import 'package:flutter/material.dart';
 
 void main() {
