@@ -2,14 +2,14 @@ import 'dart:math' show pi;
 
 import 'package:flutter/material.dart';
 
-class RotatingBox extends StatefulWidget {
-  const RotatingBox({super.key});
+class RotatingSquare extends StatefulWidget {
+  const RotatingSquare({super.key});
 
   @override
-  State<RotatingBox> createState() => _RotatingBoxState();
+  State<RotatingSquare> createState() => _RotatingSquareState();
 }
 
-class _RotatingBoxState extends State<RotatingBox>
+class _RotatingSquareState extends State<RotatingSquare>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
