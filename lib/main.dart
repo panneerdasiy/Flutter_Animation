@@ -1,4 +1,4 @@
-import 'package:animation/implicit_animation.dart';
+import 'package:animation/changing_circle_color.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: ImplicitAnimation(),
+      home: ChangingCircleColor(),
     );
   }
 }
