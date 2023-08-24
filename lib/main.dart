@@ -1,4 +1,4 @@
-import 'package:animation/polygon_anim.dart';
+import 'package:animation/anim/polygon_anim.dart';
 import 'package:flutter/material.dart';
 
 void main() {
