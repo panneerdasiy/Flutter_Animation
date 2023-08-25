@@ -1,4 +1,4 @@
-import 'package:animation/anim/polygon_anim.dart';
+import 'package:animation/anim/drawer_3d.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: const PolygonAnim(),
+      home: const Drawer3D(),
     );
   }
 }
