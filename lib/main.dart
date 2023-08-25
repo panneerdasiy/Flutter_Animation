@@ -1,4 +1,4 @@
-import 'package:animation/anim/drawer_3d.dart';
+import 'package:animation/anim/animated_alert.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +14,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: const Drawer3D(),
+      home: const Scaffold(
+        body: Center(
+          child: AnimatedAlert(
+            title: 'Thank You for your order!',
+            subtitle: 'your order will be delivered in 2 days. Enjoy!',
+            icon: Icons.cancel,
+          ),
+        ),
+      ),
     );
   }
 }
