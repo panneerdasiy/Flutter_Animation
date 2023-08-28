@@ -1,11 +1,9 @@
-import 'dart:math' show pi;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 class RotatingAndFlippingCircle extends StatefulWidget {
-  const RotatingAndFlippingCircle({
-    super.key,
-  });
+  const RotatingAndFlippingCircle({super.key});
 
   @override
   State<RotatingAndFlippingCircle> createState() =>
@@ -14,124 +12,145 @@ class RotatingAndFlippingCircle extends StatefulWidget {
 
 class _RotatingAndFlippingCircleState extends State<RotatingAndFlippingCircle>
     with TickerProviderStateMixin {
-  late AnimationController _rotationController;
-  late Animation<double> _rotationAnimation;
+  late AnimationController _zAnimationController;
+  late AnimationController _yAnimationController;
 
-  late AnimationController _flipController;
-  late Animation<double> _flipAnimation;
+  Animation<double>? _zRotationAnimation;
+  Animation<double>? _yRotationAnimation;
 
   @override
   void initState() {
-    _rotationController =
-        AnimationController(duration: const Duration(seconds: 2), vsync: this);
-    _setRotationAnimation(begin: 0, end: -pi / 2);
-
-    _flipController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    _setFlipAnimation(begin: 0, end: pi);
-
-    _rotationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _flipAnimate();
-      }
-    });
-
-    _flipController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _rotateAnimate();
-      }
-    });
-
-    _rotationController.forward();
     super.initState();
+    _zAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    _yAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    _initZRotationAnim();
+    _initYRotationAnim();
+
+    _yRotationAnimation!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _initZRotationAnim();
+        _zAnimationController
+          ..reset()
+          ..forward();
+      }
+    });
+
+    _zRotationAnimation!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _initYRotationAnim();
+        _yAnimationController
+          ..reset()
+          ..forward();
+      }
+    });
+
+    _zAnimationController.forward();
   }
 
   @override
   void dispose() {
-    _rotationController.dispose();
-    _flipController.dispose();
     super.dispose();
+    _zAnimationController.dispose();
+    _yAnimationController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _rotationAnimation,
-      builder: (context, _) {
-        return AnimatedBuilder(
-            animation: _flipAnimation,
-            builder: (context, _) {
-              return Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.identity()
-                  ..rotateZ(_rotationAnimation.value),
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.identity()..rotateY(_flipAnimation.value),
-                  child: const TwoHalfCircles(),
-                ),
-              );
-            });
-      },
-    );
+        animation: Listenable.merge([
+          _zRotationAnimation,
+          _yRotationAnimation,
+        ]),
+        builder: (context, _) {
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..rotateZ(_zRotationAnimation!.value)
+              ..rotateY(_yRotationAnimation!.value),
+            child: Transform(
+              transform: Matrix4.identity(),
+              child: const Circle(),
+            ),
+          );
+        });
   }
 
-  void _flipAnimate() {
-    _setFlipAnimation(
-      begin: _flipAnimation.value,
-      end: _flipAnimation.value - pi,
-    );
+  void _initZRotationAnim() {
+    final zBegin =
+        _zRotationAnimation == null ? 0.0 : _zRotationAnimation!.value;
+    final zEnd = zBegin - pi / 2.0;
 
-    _flipController
-      ..reset()
-      ..forward();
+    _zRotationAnimation = Tween<double>(begin: zBegin, end: zEnd)
+        .chain(CurveTween(curve: Curves.bounceOut))
+        .animate(_zAnimationController);
   }
 
-  void _rotateAnimate() {
-    _setRotationAnimation(
-      begin: _rotationAnimation.value,
-      end: _rotationAnimation.value - pi / 2,
-    );
+  void _initYRotationAnim() {
+    final yBegin =
+        _yRotationAnimation == null ? 0.0 : _yRotationAnimation!.value;
+    final yEnd = yBegin - pi;
 
-    _rotationController
-      ..reset()
-      ..forward();
+    _yRotationAnimation = Tween<double>(begin: yBegin, end: yEnd)
+        .chain(CurveTween(curve: Curves.bounceOut))
+        .animate(_yAnimationController);
   }
+}
 
-  void _setRotationAnimation({required double begin, required double end}) {
-    _rotationAnimation = Tween<double>(begin: begin, end: end).animate(
-      CurvedAnimation(
-        parent: _rotationController,
-        curve: Curves.bounceOut,
-      ),
-    );
-  }
+class Circle extends StatelessWidget {
+  const Circle({super.key});
 
-  void _setFlipAnimation({required double begin, required double end}) {
-    _flipAnimation = Tween<double>(begin: begin, end: end).animate(
-      CurvedAnimation(
-        parent: _flipController,
-        curve: Curves.bounceOut,
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ClipPath(
+          clipper: HalfCircleClipper(startAngle: pi / 2.0, sweepAngle: pi),
+          child: Container(
+            height: 200,
+            width: 200,
+            color: Colors.yellow,
+          ),
+        ),
+        ClipPath(
+          clipper: HalfCircleClipper(startAngle: 3 * pi / 2.0, sweepAngle: pi),
+          child: Container(
+            height: 200,
+            width: 200,
+            color: Colors.blue,
+          ),
+        ),
+      ],
     );
   }
 }
 
-class TwoHalfCircles extends StatelessWidget {
-  const TwoHalfCircles({super.key});
+class HalfCircleClipper extends CustomClipper<Path> {
+  final double startAngle;
+  final double sweepAngle;
+
+  HalfCircleClipper({required this.startAngle, required this.sweepAngle});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      width: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(100),
-        gradient: const LinearGradient(
-          colors: [Colors.yellow, Colors.blue],
-          stops: [0.5, 0.5],
-        ),
-      ),
+  Path getClip(Size size) {
+    final path = Path();
+    final oval = Rect.fromCircle(
+      center: Offset(size.width / 2, size.height / 2),
+      radius: size.width / 2,
     );
+    path.addArc(oval, startAngle, sweepAngle);
+    return path;
+  }
+
+  @override
+  bool shouldReclip(HalfCircleClipper oldClipper) {
+    return oldClipper.startAngle != startAngle ||
+        oldClipper.sweepAngle != sweepAngle;
   }
 }

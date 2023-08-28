@@ -1,4 +1,4 @@
-import 'package:animation/anim/rotating_cube.dart';
+import 'package:animation/anim/rotating_and_flipping_circle.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const Scaffold(
         body: Center(
-          child: RotatingCube(),
+          child: RotatingAndFlippingCircle(),
         ),
       ),
     );
