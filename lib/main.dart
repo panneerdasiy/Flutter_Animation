@@ -1,4 +1,4 @@
-import 'package:animation/anim/animated_alert.dart';
+import 'package:animation/anim/rotating_square.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,11 +16,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const Scaffold(
         body: Center(
-          child: AnimatedAlert(
-            title: 'Thank You for your order!',
-            subtitle: 'your order will be delivered in 2 days. Enjoy!',
-            icon: Icons.cancel,
-          ),
+          child: RotatingSquare(),
         ),
       ),
     );

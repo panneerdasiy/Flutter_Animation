@@ -1,4 +1,4 @@
-import 'dart:math' show pi;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -11,43 +11,44 @@ class RotatingSquare extends StatefulWidget {
 
 class _RotatingSquareState extends State<RotatingSquare>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+  late AnimationController _animationController;
+  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
-    _controller = AnimationController(
+    super.initState();
+    _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     );
-    _animation = Tween<double>(begin: 0, end: pi).animate(_controller);
-    _controller.repeat();
-    super.initState();
+    _rotationAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(
+      _animationController,
+    );
+    _animationController.repeat();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
+    _animationController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()..rotateY(_animation.value),
-          child: const BlueBox(),
-        );
-      },
-    );
+        animation: _rotationAnimation,
+        builder: (context, _) {
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()..rotateY(_rotationAnimation.value),
+            child: const Square(),
+          );
+        });
   }
 }
 
-class BlueBox extends StatelessWidget {
-  const BlueBox({
+class Square extends StatelessWidget {
+  const Square({
     super.key,
   });
 
@@ -57,18 +58,16 @@ class BlueBox extends StatelessWidget {
       height: 100,
       width: 100,
       decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(10),
-        ),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              offset: const Offset(5, 5),
-              blurRadius: 5,
-              spreadRadius: 2)
-        ],
-      ),
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.cyan,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              offset: Offset(0, 0),
+              blurRadius: 10,
+              spreadRadius: 6,
+            )
+          ]),
     );
   }
 }
